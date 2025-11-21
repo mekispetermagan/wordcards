@@ -3,16 +3,20 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:convert';
 import 'phrasecard_logic.dart';
+import 'rotating_hue_image.dart';
 
 enum Status {title, idle, correct, incorrect, ended}
 
 class GemImage extends StatelessWidget {
-  final int frame;
-  const GemImage({required this.frame, super.key});
+  final double delta;
+  const GemImage({this.delta = 0, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Image(image:AssetImage("images/gem.png"));
+    return RotatingHueImage(
+      image:Image(image: AssetImage("images/gem.png")),
+      startingAngle: delta,
+    );
   }
 }
 
@@ -22,10 +26,13 @@ class ScoreArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      children: [
-        for (int i=0; i<score; i++) GemImage(frame: 0)
-      ],
+    return RotatingHue(
+      rotationSpeed: 24,
+      child: Wrap(
+        children: [
+          for (int i=0; i<score; i++) GemImage(delta: i*60)
+        ],
+      ),
     );
   }
 }

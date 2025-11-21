@@ -16,5 +16,29 @@
         "hun": ["Hogy vagy"],
         "lug": ["Oli otya", "Ogamba otya"],
         "nyn": ["Nogamba kyi"]
+    },
+    {
+        "eng": ["I love you"],
+        "hun": ["Szeretlek"],
+        "lug": ["Nkwagala"],
+        "nyn": ["Ninkukunda"]
+    },
+    {
+        "eng": ["You are beautiful"],
+        "hun": ["Szép vagy"],
+        "lug": ["Oli mulungi"],
+        "nyn": ["Oboneire"]
+    },
+    {
+        "eng": ["Sorry", "I am sorry"],
+        "hun": ["Bocsánat", "Bocsi"],
+        "lug": ["Nsonyiwa"],
+        "nyn": ["Nsasira"]
+    },
+    {
+        "eng": ["I love you, too"],
+        "hun": ["Én is szeretlek"],
+        "lug": ["Nange nkwagala"],
+        "nyn": ["Nanye ninkukunda"]
     }
 ]
