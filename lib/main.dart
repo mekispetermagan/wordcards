@@ -6,6 +6,30 @@ import 'phrasecard_logic.dart';
 
 enum Status {title, idle, correct, incorrect, ended}
 
+class GemImage extends StatelessWidget {
+  final int frame;
+  const GemImage({required this.frame, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image(image:AssetImage("images/gem.png"));
+  }
+}
+
+class ScoreArea extends StatelessWidget {
+  final int score;
+  const ScoreArea({required this.score, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      children: [
+        for (int i=0; i<score; i++) GemImage(frame: 0)
+      ],
+    );
+  }
+}
+
 class TitleScreen extends StatelessWidget {
   final VoidCallback? onStart;
 
@@ -58,12 +82,14 @@ class TitleScreen extends StatelessWidget {
 class GameScreen extends StatelessWidget {
   final PhraseCardExercise? exercise;
   final void Function(int)? onSubmit;
+  final int score;
   final int? correctHighlightIndex;
   final int? incorrectHighlightIndex;
 
   const GameScreen({
     required this.exercise,
     required this.onSubmit,
+    required this.score,
     this.correctHighlightIndex,
     this.incorrectHighlightIndex,
     super.key});
@@ -83,7 +109,7 @@ class GameScreen extends StatelessWidget {
               ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Card(
                   color: colorScheme.primaryContainer,
@@ -125,6 +151,7 @@ class GameScreen extends StatelessWidget {
                       )
                     ),
                   ),
+                ScoreArea(score: score),
               ],
             ),
           ),
@@ -175,6 +202,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   late PhraseCardManager manager;
   Status _status = Status.title;
+  late Future<List<PhraseCluster>> _dataFuture;
+  int _score = 0;
   PhraseCardManager? _manager;
   PhraseCardExercise? _currentExercise;
   int? _selectedIndex;
@@ -182,6 +211,12 @@ class _HomePageState extends State<HomePage> {
     ..setReleaseMode(ReleaseMode.stop);
   final AudioPlayer _incorrectPlayer = AudioPlayer()
     ..setReleaseMode(ReleaseMode.stop);
+
+  @override
+  void initState() {
+    super.initState();
+    _dataFuture = loadDataAsset("data/data.json");
+  }
 
   void _createExercise() {
     final m = _manager;
@@ -198,6 +233,7 @@ class _HomePageState extends State<HomePage> {
     if (_selectedIndex == _currentExercise!.correctIndex) {
       setState(() {
         _status = Status.correct;
+        _score++;
       });
       _correctPlayer.stop();
       _correctPlayer.play(AssetSource("audio/correct.mp3"));
@@ -213,6 +249,7 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) {return;}
     setState(() {
       _status = Status.idle;
+      _selectedIndex = null;
       _createExercise();
     });
 
@@ -221,7 +258,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
       return FutureBuilder<List<PhraseCluster>>(
-      future: loadDataAsset(("data/data.json")),
+      future: _dataFuture,
       builder: (context, snapshot) {
         // title screen with loading symbol
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -234,26 +271,35 @@ class _HomePageState extends State<HomePage> {
         // all other screens
         final data = snapshot.data;
         if (data == null) return Center(child: Text("Uh oh..."));
-        _manager = PhraseCardManager(
-          phraseStock: data,
-          sourceLang: Language.hun,
-          targetLang: Language.eng,
-          optionsLength: 3,
-        );
+        if (_manager == null) {
+          _manager = PhraseCardManager(
+            phraseStock: data,
+            sourceLang: Language.hun,
+            targetLang: Language.eng,
+            optionsLength: 3,
+          );
+          _createExercise();
+        }
         _createExercise();
         return switch(_status) {
           Status.title => TitleScreen(onStart: _onStart),
-          Status.idle => GameScreen(exercise: _currentExercise, onSubmit: _onSubmit),
+          Status.idle => GameScreen(
+            exercise: _currentExercise,
+            onSubmit: _onSubmit,
+            score: _score,
+          ),
           Status.correct
             => GameScreen(
               exercise: _currentExercise,
               onSubmit: null,
+              score: _score,
               correctHighlightIndex: _currentExercise!.correctIndex,
             ),
           Status.incorrect
             => GameScreen(
               exercise: _currentExercise,
               onSubmit: null,
+              score: _score,
               correctHighlightIndex: _currentExercise!.correctIndex,
               incorrectHighlightIndex: _selectedIndex,
             ),
