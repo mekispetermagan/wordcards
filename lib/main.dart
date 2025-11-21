@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:convert';
 import 'phrasecard_logic.dart';
 import 'rotating_hue_image.dart';
 
-enum Status {title, idle, correct, incorrect, ended}
+enum Status {title, language, idle, correct, incorrect, ended}
 
 class GemImage extends StatelessWidget {
   final double delta;
@@ -17,6 +18,67 @@ class GemImage extends StatelessWidget {
       image:Image(image: AssetImage("images/gem.png")),
       startingAngle: delta,
     );
+  }
+}
+
+class LanguageMenu extends StatelessWidget {
+  final void Function(Set<Language>) onSelect;
+  final Language? selected;
+
+  const LanguageMenu({
+    required this.onSelect,
+    required this.selected,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+  final s = selected;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return SegmentedButton<Language>(
+      onSelectionChanged: onSelect,
+      direction: Axis.vertical,
+      selected: s != null ? {s} : {},
+      emptySelectionAllowed: true,
+      style: ButtonStyle(
+        // padding: WidgetStatePropertyAll(
+        //   EdgeInsets.symmetric(horizontal: 24, vertical: 36),
+        // ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        visualDensity: VisualDensity(horizontal: 3, vertical: 1),
+        backgroundColor: WidgetStatePropertyAll(colorScheme.primaryContainer),
+        foregroundColor: WidgetStatePropertyAll(colorScheme.onPrimaryContainer),
+        textStyle: WidgetStatePropertyAll(TextStyle(
+          fontSize: 18,
+        )),
+      ),
+      segments: <ButtonSegment<Language>>[
+        ButtonSegment(
+          icon: Text("🇬🇧"),
+          value: Language.eng,
+          label: Text("English"),
+          ),
+        ButtonSegment(
+          icon: Text("🇭🇺"),
+          value: Language.hun,
+          label: Text("Hungarian"),
+          ),
+        ButtonSegment(
+          icon: Text("🇺🇬"),
+          value: Language.lug,
+          label: Text("Luganda"),
+          ),
+        ButtonSegment(
+          icon: Text("🇺🇬"),
+          value: Language.nyn,
+          label: Text("Runyankore"),
+          ),
+      ],
+    ) ;
   }
 }
 
@@ -79,6 +141,77 @@ class TitleScreen extends StatelessWidget {
                   ),
                   ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LanguageScreen extends StatelessWidget {
+  final void Function(Set<Language>) onSourceSelect;
+  final void Function(Set<Language>) onTargetSelect;
+  final Language? selectedSource;
+  final Language? selectedTarget;
+
+  const LanguageScreen({
+    required this.onSourceSelect,
+    required this.onTargetSelect,
+    required this.selectedSource,
+    required this.selectedTarget,
+    super.key
+    });
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Center(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Text(
+                "Choose languages!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: colorScheme.onSurface,
+                  fontSize: 36,
+                )
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Source language:",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: colorScheme.onSurface,
+                    )
+                  ),
+                  LanguageMenu(
+                    onSelect: onSourceSelect,
+                    selected: selectedSource,
+                    ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    "Target language:",
+                    style: TextStyle(
+                      fontSize: 24,
+                      color: colorScheme.onSurface,
+                    )
+                  ),
+                  LanguageMenu(
+                    onSelect: onTargetSelect,
+                    selected: selectedTarget,
+                    ),
+                ],
+              ),
+            ]
           ),
         ),
       ),
@@ -187,6 +320,7 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: "Phrasecard app",
       theme: ThemeData(
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.teal,
           brightness: Brightness.dark,
@@ -207,11 +341,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late PhraseCardManager manager;
+  late PhraseCardManager _manager;
   Status _status = Status.title;
   late Future<List<PhraseCluster>> _dataFuture;
   int _score = 0;
-  PhraseCardManager? _manager;
+  Language? sourceLanguage;
+  Language? targetLanguage;
+  List<PhraseCluster>? _phraseStock;
   PhraseCardExercise? _currentExercise;
   int? _selectedIndex;
   final AudioPlayer _correctPlayer = AudioPlayer()
@@ -226,13 +362,45 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _createExercise() {
-    final m = _manager;
-    if (m == null) return;
-    _currentExercise = m.getExercise();
+    _currentExercise = _manager.getExercise();
   }
 
   void _onStart() {
-    setState(() => _status = Status.idle);
+    setState(() => _status = Status.language);
+  }
+
+  void _onSourceSelect(Set<Language>langSet) {
+    setState((){
+      if (langSet.isNotEmpty) {sourceLanguage = langSet.single;}
+    });
+    _checkLanguageSelection();
+  }
+
+  void _onTargetSelect(Set<Language>langSet) {
+    setState((){
+      if (langSet.isNotEmpty) {targetLanguage = langSet.single;}
+    });
+    _checkLanguageSelection();
+  }
+
+  Future<void> _checkLanguageSelection() async {
+    final sl = sourceLanguage;
+    final tl = targetLanguage;
+    if (sl == null || tl == null) {return;}
+    // At this point data has to be loaded; _phraseStock cannot be null.
+    final stock = _phraseStock!;
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (!mounted) {return;}
+    setState(() {
+      _manager = PhraseCardManager(
+        phraseStock: stock,
+        sourceLang: sl,
+        targetLang: tl,
+        optionsLength: 3,
+      );
+      _createExercise();
+      _status = Status.idle;
+    });
   }
 
   Future<void> _onSubmit(int i) async {
@@ -259,7 +427,6 @@ class _HomePageState extends State<HomePage> {
       _selectedIndex = null;
       _createExercise();
     });
-
   }
 
   @override
@@ -278,18 +445,15 @@ class _HomePageState extends State<HomePage> {
         // all other screens
         final data = snapshot.data;
         if (data == null) return Center(child: Text("Uh oh..."));
-        if (_manager == null) {
-          _manager = PhraseCardManager(
-            phraseStock: data,
-            sourceLang: Language.hun,
-            targetLang: Language.eng,
-            optionsLength: 3,
-          );
-          _createExercise();
-        }
-        _createExercise();
+        _phraseStock = data;
         return switch(_status) {
           Status.title => TitleScreen(onStart: _onStart),
+          Status.language => LanguageScreen(
+            onSourceSelect: _onSourceSelect,
+            onTargetSelect: _onTargetSelect,
+            selectedSource: sourceLanguage,
+            selectedTarget: targetLanguage,
+          ),
           Status.idle => GameScreen(
             exercise: _currentExercise,
             onSubmit: _onSubmit,
