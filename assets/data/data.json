@@ -1,0 +1,20 @@
+[
+    {
+        "eng": ["Good morning"],
+        "hun": ["Jó reggelt"],
+        "lug": ["Wasuze otya"],
+        "nyn": ["Orirota"]
+    },
+    {
+        "eng": ["Thank you", "Thanks"],
+        "hun": ["Köszönöm", "Köszi"],
+        "lug": ["Neyanzizza", "Webale"],
+        "nyn": ["Webare", "Nasiima"]
+    },
+    {
+        "eng": ["How are you"],
+        "hun": ["Hogy vagy"],
+        "lug": ["Oli otya", "Ogamba otya"],
+        "nyn": ["Nogamba kyi"]
+    }
+]
