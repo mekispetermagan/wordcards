@@ -1,9 +1,57 @@
 [
     {
+        "eng": ["I love you"],
+        "hun": ["Szeretlek"],
+        "lug": ["Nkwagala"],
+        "nyn": ["Ninkukunda"]
+    },
+    {
+        "eng": ["I love you, too"],
+        "hun": ["Én is szeretlek"],
+        "lug": ["Nange nkwagala"],
+        "nyn": ["Nanye ninkukunda"]
+    },
+    {
+        "eng": ["I love you very much", "I love you so"],
+        "hun": ["Nagyon szeretlek"],
+        "lug": ["Nkwagala nyo"],
+        "nyn": ["Ninkukunda munonga"]
+    },
+    {
+        "eng": ["Darling", "My dear"],
+        "hun": ["Kicsim", "Kincsem", "Életem", "Virágom"],
+        "lug": ["Mukwano"],
+        "nyn": ["Omukundwa wangye"]
+    },
+    {
+        "eng": ["Wild flower"],
+        "hun": ["Vadvirág"],
+        "lug": ["Kimuli kyange"],
+        "nyn": ["Ekyimuli kyange"]
+    },
+    {
+        "eng": ["Hi", "Hello"],
+        "hun": ["Szia"],
+        "lug": ["Abeyo", "Abeno"],
+        "nyn": ["Abakunu"]
+    },
+    {
         "eng": ["Good morning"],
         "hun": ["Jó reggelt"],
         "lug": ["Wasuze otya"],
         "nyn": ["Orirota"]
+    },
+    {
+        "eng": ["Good night"],
+        "hun": ["Jó éjt"],
+        "lug": ["Sula bulungi"],
+        "nyn": ["Oraregye"]
+    },
+    {
+        "eng": ["You're lying"],
+        "hun": ["Hazudsz"],
+        "lug": ["Olimba"],
+        "nyn": ["Nobiha"]
     },
     {
         "eng": ["Thank you", "Thanks"],
@@ -12,33 +60,153 @@
         "nyn": ["Webare", "Nasiima"]
     },
     {
-        "eng": ["How are you"],
-        "hun": ["Hogy vagy"],
-        "lug": ["Oli otya", "Ogamba otya"],
-        "nyn": ["Nogamba kyi"]
+        "eng": ["Thank you very much", "Thanks a lot"],
+        "hun": ["Köszönöm szépen", "Köszi szépen"],
+        "lug": ["Neyanzizza nyo", "Webale nyo"],
+        "nyn": ["Webare munonga", "Nasiima munonga"]
     },
     {
-        "eng": ["I love you"],
-        "hun": ["Szeretlek"],
-        "lug": ["Nkwagala"],
-        "nyn": ["Ninkukunda"]
+        "eng": ["Please."],
+        "hun": ["Légyszi."],
+        "lug": ["Bambi."],
+        "nyn": ["Bambi."]
     },
     {
-        "eng": ["You are beautiful"],
-        "hun": ["Szép vagy"],
-        "lug": ["Oli mulungi"],
-        "nyn": ["Oboneire"]
+        "eng": ["Sorry.", "I am sorry."],
+        "hun": ["Bocsánat.", "Bocsi."],
+        "lug": ["Nsonyiwa."],
+        "nyn": ["Nsasira."]
     },
     {
-        "eng": ["Sorry", "I am sorry"],
-        "hun": ["Bocsánat", "Bocsi"],
-        "lug": ["Nsonyiwa"],
-        "nyn": ["Nsasira"]
+        "eng": ["How are you."],
+        "hun": ["Hogy vagy."],
+        "lug": ["Oli otya.", "Ogamba otya."],
+        "nyn": ["Nogamba kyi."]
     },
     {
-        "eng": ["I love you, too"],
-        "hun": ["Én is szeretlek"],
-        "lug": ["Nange nkwagala"],
-        "nyn": ["Nanye ninkukunda"]
+        "eng": ["I'm fine.", "Fine."],
+        "hun": ["Jól.", "Jól vagyok."],
+        "lug": ["Bulungi.", "Ndi Bulungi.", "Jendi."],
+        "nyn": ["Ndi kurungi.", "Ndijje."]
+    },
+    {
+        "eng": ["Yes."],
+        "hun": ["Igen."],
+        "lug": ["Iye."],
+        "nyn": ["Ego."]
+    },
+    {
+        "eng": ["No."],
+        "hun": ["Nem."],
+        "lug": ["Nedda."],
+        "nyn": ["Apana.", "Ingaha."]
+    },
+    {
+        "eng": ["You are beautiful."],
+        "hun": ["Szép vagy."],
+        "lug": ["Oli mulungi."],
+        "nyn": ["Oboneire."]
+    },
+    {
+        "eng": ["Was it good?"],
+        "hun": ["Jó volt?"],
+        "lug": ["Kibadde bulungi?"],
+        "nyn": ["Kyaba kiri jje?"]
+    },
+    {
+        "eng": ["It was good."],
+        "hun": ["Jó volt."],
+        "lug": ["Kibadde bulungi."],
+        "nyn": ["Kyaba jje.", "Kyaba kiri kurungi."]
+    },
+    {
+        "eng": ["My god!"],
+        "hun": ["Istenem!"],
+        "lug": ["Katonda wange!"],
+        "nyn": ["Ruhanga wangye!"]
+    },
+    {
+        "eng": ["What's up?"],
+        "hun": ["Mi van?"],
+        "lug": ["Ki kati?", "Kye kiliwo?", "Ogamba ki?"],
+        "nyn": ["Haruho kyi?"]
+    },
+    {
+        "eng": ["Nothing."],
+        "hun": ["Semmi."],
+        "lug": ["Tewali."],
+        "nyn": ["Tihine akyiriho."]
+    },
+    {
+        "eng": ["Come on!"],
+        "hun": ["Ne már!"],
+        "lug": ["Vaawo naawe!"],
+        "nyn": ["Rugaho niwe!"]
+    },
+    {
+        "eng": ["Na és?"],
+        "hun": ["So what?"],
+        "lug": ["Kati olwo mbu ki?"],
+        "nyn": ["Mbenu obwo shi, nikyi?"]
+    },
+    {
+        "eng": ["What's your name?"],
+        "hun": ["Hogy hívnak?"],
+        "lug": ["Emannya ggwe ani?"],
+        "nyn": ["Eizina lyawe oryoha", "Nibakweta oha?"]
+    },
+    {
+        "eng": ["How old are you?"],
+        "hun": ["Hány éves vagy?"],
+        "lug": ["Olina emyake emeka?"],
+        "nyn": ["Oine emyaka engahi?"]
+    },
+    {
+        "eng": ["I want to eat."],
+        "hun": ["Szeretnék enni."],
+        "lug": ["Njagala kulya."],
+        "nyn": ["Ninyenda kulya."]
+    },
+    {
+        "eng": ["I'm sleepy."],
+        "hun": ["Álmos vagyok."],
+        "lug": ["Mpulira otulo."],
+        "nyn": ["Nnimpulira itiro."]
+    },
+    {
+        "eng": ["I'm hungry"],
+        "hun": ["Éhes vagyok"],
+        "lug": ["Enjala ennuma"],
+        "nyn": ["Nyine enjjala"]
+    },
+    {
+        "eng": [""],
+        "hun": [""],
+        "lug": [""],
+        "nyn": [""]
+    },
+    {
+        "eng": [""],
+        "hun": [""],
+        "lug": [""],
+        "nyn": [""]
+    },
+    {
+        "eng": [""],
+        "hun": [""],
+        "lug": [""],
+        "nyn": [""]
+    },
+    {
+        "eng": [""],
+        "hun": [""],
+        "lug": [""],
+        "nyn": [""]
+    },
+    {
+        "eng": [""],
+        "hun": [""],
+        "lug": [""],
+        "nyn": [""]
     }
 ]
