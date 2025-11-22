@@ -1,31 +1,84 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'dart:convert';
 import 'phrasecard_logic.dart';
 import 'rotating_hue_image.dart';
 
-enum Status {title, language, idle, correct, incorrect, ended}
+enum ExerciseStatus {title, language, idle, correct, incorrect, result}
 
-class GemImage extends StatelessWidget {
-  final double delta;
-  const GemImage({this.delta = 0, super.key});
+class _PrimaryActionButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onPressed;
+
+  const _PrimaryActionButton({
+    required this.text,
+    required this.onPressed,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return RotatingHueImage(
-      image:Image(image: AssetImage("images/gem.png")),
-      startingAngle: delta,
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return TextButton(
+      onPressed: onPressed,
+      style: ButtonStyle(
+        backgroundColor: WidgetStatePropertyAll(colorScheme.primaryContainer),
+        foregroundColor: WidgetStatePropertyAll(colorScheme.onPrimaryContainer),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 30,
+          )
+          ),
+      ),
+      );
+  }
+}
+
+class _CoverImage extends StatelessWidget {
+  const _CoverImage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 400),
+      child: Image(
+      image: AssetImage(
+        kIsWeb
+          ? "images/black_girl_white_boy.png"
+          : "assets/images/black_girl_white_boy.png",
+      ),
+      fit: BoxFit.contain,
+      ),
     );
   }
 }
 
-class LanguageMenu extends StatelessWidget {
+class _GemImage extends StatelessWidget {
+  final double angleOffset;
+  const _GemImage({this.angleOffset = 0, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return RotatingHueImage(
+      image:Image(image: AssetImage(
+        kIsWeb ? "images/gem.png" : "assets/images/gem.png"
+      )),
+      startingAngle: angleOffset,
+    );
+  }
+}
+
+class _LanguageSelector extends StatelessWidget {
   final void Function(Set<Language>) onSelect;
   final Language? selected;
 
-  const LanguageMenu({
+  const _LanguageSelector({
     required this.onSelect,
     required this.selected,
     super.key,
@@ -33,7 +86,7 @@ class LanguageMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  final s = selected;
+    final s = selected;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return SegmentedButton<Language>(
       onSelectionChanged: onSelect,
@@ -49,7 +102,7 @@ class LanguageMenu extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        visualDensity: VisualDensity(horizontal: 3, vertical: 1),
+        visualDensity: VisualDensity(horizontal: 4, vertical: 1),
         backgroundColor: WidgetStatePropertyAll(colorScheme.primaryContainer),
         foregroundColor: WidgetStatePropertyAll(colorScheme.onPrimaryContainer),
         textStyle: WidgetStatePropertyAll(TextStyle(
@@ -82,9 +135,9 @@ class LanguageMenu extends StatelessWidget {
   }
 }
 
-class ScoreArea extends StatelessWidget {
+class _ScoreArea extends StatelessWidget {
   final int score;
-  const ScoreArea({required this.score, super.key});
+  const _ScoreArea({required this.score, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -92,17 +145,17 @@ class ScoreArea extends StatelessWidget {
       rotationSpeed: 24,
       child: Wrap(
         children: [
-          for (int i=0; i<score; i++) GemImage(delta: i*60)
+          for (int i=0; i<score; i++) _GemImage(angleOffset: i*60)
         ],
       ),
     );
   }
 }
 
-class TitleScreen extends StatelessWidget {
+class _TitleScreen extends StatelessWidget {
   final VoidCallback? onStart;
 
-  const TitleScreen({required this.onStart, super.key});
+  const _TitleScreen({required this.onStart, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -117,29 +170,16 @@ class TitleScreen extends StatelessWidget {
             children: <Widget>[
               Text(
                 "Practice Your Language Skills!",
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontSize: 36,
                 )
               ),
+              _CoverImage(),
               (onStart == null)
                 ? CircularProgressIndicator()
-                : TextButton(
-                  onPressed: onStart,
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(colorScheme.primary),
-                    foregroundColor: WidgetStatePropertyAll(colorScheme.onPrimary),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Start",
-                      style: TextStyle(
-                        fontSize: 24,
-                      )
-                      ),
-                  ),
-                  ),
+                : _PrimaryActionButton(text: "Start", onPressed: onStart)
             ],
           ),
         ),
@@ -148,13 +188,13 @@ class TitleScreen extends StatelessWidget {
   }
 }
 
-class LanguageScreen extends StatelessWidget {
+class _LanguageScreen extends StatelessWidget {
   final void Function(Set<Language>) onSourceSelect;
   final void Function(Set<Language>) onTargetSelect;
   final Language? selectedSource;
   final Language? selectedTarget;
 
-  const LanguageScreen({
+  const _LanguageScreen({
     required this.onSourceSelect,
     required this.onTargetSelect,
     required this.selectedSource,
@@ -190,7 +230,7 @@ class LanguageScreen extends StatelessWidget {
                       color: colorScheme.onSurface,
                     )
                   ),
-                  LanguageMenu(
+                  _LanguageSelector(
                     onSelect: onSourceSelect,
                     selected: selectedSource,
                     ),
@@ -205,7 +245,7 @@ class LanguageScreen extends StatelessWidget {
                       color: colorScheme.onSurface,
                     )
                   ),
-                  LanguageMenu(
+                  _LanguageSelector(
                     onSelect: onTargetSelect,
                     selected: selectedTarget,
                     ),
@@ -219,14 +259,14 @@ class LanguageScreen extends StatelessWidget {
   }
 }
 
-class GameScreen extends StatelessWidget {
+class _GameScreen extends StatelessWidget {
   final PhraseCardExercise? exercise;
   final void Function(int)? onSubmit;
   final int score;
   final int? correctHighlightIndex;
   final int? incorrectHighlightIndex;
 
-  const GameScreen({
+  const _GameScreen({
     required this.exercise,
     required this.onSubmit,
     required this.score,
@@ -291,7 +331,7 @@ class GameScreen extends StatelessWidget {
                       )
                     ),
                   ),
-                ScoreArea(score: score),
+                _ScoreArea(score: score),
               ],
             ),
           ),
@@ -303,17 +343,47 @@ class GameScreen extends StatelessWidget {
   }
 }
 
-class EndScreen extends StatelessWidget {
-  EndScreen({super.key});
+class _ResultScreen extends StatelessWidget {
+  final int score;
+  final int round;
+  final VoidCallback onReset;
+
+  const _ResultScreen({
+    required this.score,
+    required this.round,
+    required this.onReset,
+    super.key
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("How did you get here?"),);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    final int scoreRate = (score / round * 100).round();
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Text(
+              "Thanks for playing! You collected $score gems in $round rounds, "
+              "making $scoreRate% today. See you tomorrow, or...",
+              style: TextStyle(
+                fontSize: 24,
+                color: colorScheme.onSurface,
+              ),
+            ),
+            _CoverImage(),
+            _PrimaryActionButton(text: "Play again", onPressed: onReset),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class App extends StatelessWidget {
-  const App({super.key});
+class _App extends StatelessWidget {
+  const _App({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -325,6 +395,7 @@ class App extends StatelessWidget {
           seedColor: Colors.teal,
           brightness: Brightness.dark,
         ),
+        textTheme: GoogleFonts.montserratTextTheme(),
       ),
       home: const HomePage(title: "PhraseCard exercise"),
     );
@@ -341,14 +412,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late PhraseCardManager _manager;
-  Status _status = Status.title;
+  ExerciseStatus _status = ExerciseStatus.title;
   late Future<List<PhraseCluster>> _dataFuture;
-  int _score = 0;
-  Language? sourceLanguage;
-  Language? targetLanguage;
   List<PhraseCluster>? _phraseStock;
+  Language? _sourceLanguage;
+  Language? _targetLanguage;
+  late PhraseCardManager _exerciseManager;
   PhraseCardExercise? _currentExercise;
+  int _round = 0;
+  int _score = 0;
   int? _selectedIndex;
   final AudioPlayer _correctPlayer = AudioPlayer()
     ..setReleaseMode(ReleaseMode.stop);
@@ -358,48 +430,57 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _dataFuture = loadDataAsset("data/data.json");
+    _dataFuture = loadDataAsset(
+      kIsWeb ? "data/data.json" : "assets/data/data.json"
+      );
+  }
+
+  @override
+  void dispose() {
+    _correctPlayer.dispose();
+    _incorrectPlayer.dispose();
+    super.dispose();
   }
 
   void _createExercise() {
-    _currentExercise = _manager.getExercise();
+    _currentExercise = _exerciseManager.getExercise();
   }
 
   void _onStart() {
-    setState(() => _status = Status.language);
+    setState(() => _status = ExerciseStatus.language);
   }
 
   void _onSourceSelect(Set<Language>langSet) {
     setState((){
-      if (langSet.isNotEmpty) {sourceLanguage = langSet.single;}
+      if (langSet.isNotEmpty) {_sourceLanguage = langSet.single;}
     });
     _checkLanguageSelection();
   }
 
   void _onTargetSelect(Set<Language>langSet) {
     setState((){
-      if (langSet.isNotEmpty) {targetLanguage = langSet.single;}
+      if (langSet.isNotEmpty) {_targetLanguage = langSet.single;}
     });
     _checkLanguageSelection();
   }
 
   Future<void> _checkLanguageSelection() async {
-    final sl = sourceLanguage;
-    final tl = targetLanguage;
+    final sl = _sourceLanguage;
+    final tl = _targetLanguage;
     if (sl == null || tl == null) {return;}
     // At this point data has to be loaded; _phraseStock cannot be null.
     final stock = _phraseStock!;
     await Future.delayed(const Duration(milliseconds: 200));
     if (!mounted) {return;}
     setState(() {
-      _manager = PhraseCardManager(
+      _exerciseManager = PhraseCardManager(
         phraseStock: stock,
         sourceLang: sl,
         targetLang: tl,
         optionsLength: 3,
       );
       _createExercise();
-      _status = Status.idle;
+      _status = ExerciseStatus.idle;
     });
   }
 
@@ -407,25 +488,43 @@ class _HomePageState extends State<HomePage> {
     _selectedIndex = i;
     if (_selectedIndex == _currentExercise!.correctIndex) {
       setState(() {
-        _status = Status.correct;
+        _status = ExerciseStatus.correct;
         _score++;
       });
       _correctPlayer.stop();
       _correctPlayer.play(AssetSource("audio/correct.mp3"));
     } else {
       setState(() {
-        _status = Status.incorrect;
-      _createExercise();
+        _status = ExerciseStatus.incorrect;
       });
       _incorrectPlayer.stop();
       _incorrectPlayer.play(AssetSource("audio/incorrect.mp3"));
     }
     await Future.delayed(const Duration(milliseconds: 500));
     if (!mounted) {return;}
+    _round++;
+    if (_round<12) {
+      setState(() {
+        _status = ExerciseStatus.idle;
+        _selectedIndex = null;
+        _createExercise();
+      });
+    } else {
+      setState(() {
+        _status = ExerciseStatus.result;
+      });
+    }
+  }
+
+  void _onReset() {
     setState(() {
-      _status = Status.idle;
-      _selectedIndex = null;
-      _createExercise();
+    _round = 0;
+    _score = 0;
+    _sourceLanguage = null;
+    _targetLanguage = null;
+    _currentExercise = null;
+    _selectedIndex = null;
+    _status = ExerciseStatus.language;
     });
   }
 
@@ -436,7 +535,7 @@ class _HomePageState extends State<HomePage> {
       builder: (context, snapshot) {
         // title screen with loading symbol
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return TitleScreen(onStart: null);
+          return _TitleScreen(onStart: null);
         }
         // error screen
         if (snapshot.hasError) {
@@ -445,36 +544,40 @@ class _HomePageState extends State<HomePage> {
         // all other screens
         final data = snapshot.data;
         if (data == null) return Center(child: Text("Uh oh..."));
-        _phraseStock = data;
+        _phraseStock ??= data;
         return switch(_status) {
-          Status.title => TitleScreen(onStart: _onStart),
-          Status.language => LanguageScreen(
+          ExerciseStatus.title => _TitleScreen(onStart: _onStart),
+          ExerciseStatus.language => _LanguageScreen(
             onSourceSelect: _onSourceSelect,
             onTargetSelect: _onTargetSelect,
-            selectedSource: sourceLanguage,
-            selectedTarget: targetLanguage,
+            selectedSource: _sourceLanguage,
+            selectedTarget: _targetLanguage,
           ),
-          Status.idle => GameScreen(
+          ExerciseStatus.idle => _GameScreen(
             exercise: _currentExercise,
             onSubmit: _onSubmit,
             score: _score,
           ),
-          Status.correct
-            => GameScreen(
+          ExerciseStatus.correct
+            => _GameScreen(
               exercise: _currentExercise,
               onSubmit: null,
               score: _score,
               correctHighlightIndex: _currentExercise!.correctIndex,
             ),
-          Status.incorrect
-            => GameScreen(
+          ExerciseStatus.incorrect
+            => _GameScreen(
               exercise: _currentExercise,
               onSubmit: null,
               score: _score,
               correctHighlightIndex: _currentExercise!.correctIndex,
               incorrectHighlightIndex: _selectedIndex,
             ),
-          Status.ended => EndScreen(),
+          ExerciseStatus.result => _ResultScreen(
+            score: _score,
+            round: _round,
+            onReset: _onReset,
+          ),
         };
       }
 
@@ -503,5 +606,6 @@ Future<List<PhraseCluster>> loadDataAsset(String assetPath) async {
 }
 
 void main() {
-  runApp(const App());
+  GoogleFonts.config.allowRuntimeFetching = false;
+  runApp(const _App());
 }
